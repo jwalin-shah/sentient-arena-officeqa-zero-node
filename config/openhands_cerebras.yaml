@@ -6,7 +6,7 @@ backend:
     api_key_env: CEREBRAS_API_KEY
     base_url: https://api.cerebras.ai/v1
     max_output_tokens: 4096
-    solve_max_output_tokens: 16384
+    solve_max_output_tokens: 4096
     timeout_seconds: 120
     solve_prompt_max_chunks: 2
     solve_prompt_max_chars_per_chunk: 2500
@@ -15,7 +15,12 @@ backend:
     structured_output: true
     parse_schema_name: officeqa_parse_v1
     solve_schema_name: officeqa_solve_v1
-    system_prompt_path: prompts/officeqa_prompt.j2
+    system_prompt_path: arena_official/prompts/system.j2
+    skill_paths:
+      - arena_official/skills/parse_contract.md
+      - arena_official/skills/evidence_extraction.md
+      - arena_official/skills/verification_arithmetic.md
+      - arena_official/skills/grounding_verification_contract.md
 subset:
   limit: 3
 pipeline:
@@ -28,7 +33,7 @@ corpus:
   root_dir: external/officeqa/treasury_bulletins_parsed/transformed
   format: transformed_txt
   max_files_from_year_fallback: 0
-  max_chunks_per_file: 3
+  max_chunks_per_file: 4
   max_chars_per_chunk: 10000
   max_total_chunks: 6
 evaluation:

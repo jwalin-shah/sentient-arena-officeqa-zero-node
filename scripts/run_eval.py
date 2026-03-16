@@ -11,6 +11,13 @@ import sys
 import time
 from typing import Any
 
+# Auto-activate venv if present and not already inside one
+_ROOT = Path(__file__).resolve().parents[1]
+_VENV_PYTHON = _ROOT / ".venv" / "bin" / "python3"
+if _VENV_PYTHON.exists() and Path(sys.executable).resolve() != _VENV_PYTHON.resolve():
+    import os
+    os.execv(str(_VENV_PYTHON), [str(_VENV_PYTHON)] + sys.argv)
+
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]

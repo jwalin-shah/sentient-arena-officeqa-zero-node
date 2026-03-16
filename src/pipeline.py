@@ -64,6 +64,18 @@ def _failed_families(*, parse_valid: bool, solve_valid: bool, numeric_correct: b
     return failures
 
 
+REASON_CODE_REPAIRS: dict[str, str] = {
+    "matched_snippet_not_found": "Your matched_snippet must be a verbatim copy-paste from the corpus. Do not paraphrase.",
+    "matched_snippet_missing": "You must include matched_snippet — copy the table row exactly as it appears in the file.",
+    "raw_value_not_found": "Your raw_value must match the exact string in the corpus including commas and formatting (e.g., '2,602.5').",
+    "row_label_not_found": "Copy the row label character-for-character from the table including hyphens and capitalization.",
+    "column_label_not_found": "Copy the column header exactly as it appears in the table.",
+    "source_file_mismatch": "Use only the source_file listed in metadata.source_files.",
+    "year_mismatch": "Your evidence must come from the correct fiscal year. Check the column headers carefully.",
+    "topic_mismatch": "Your evidence row must relate to the metric asked about in the question.",
+}
+
+
 def _build_repair_brief(*, attempt_idx: int, schema_validation: dict[str, Any], grounding_checks: list[dict[str, Any]], eval_details: dict[str, Any], scores: dict[str, Any], final_answer: Any, expected_answer: Any) -> dict[str, Any]:
     failing_rows = [c for c in grounding_checks if not c.get("matched")]
     next_iteration_instructions: list[str] = []
@@ -78,9 +90,18 @@ def _build_repair_brief(*, attempt_idx: int, schema_validation: dict[str, Any], 
             "Return solve JSON with required evidence_rows and all required row fields, including matched_snippet."
         )
     if failing_rows:
-        next_iteration_instructions.append(
-            "Use only metadata.source_files and copy row_label, column_label, and raw_value as literal strings from provided corpus chunks."
-        )
+        seen_codes: set[str] = set()
+        for row in failing_rows:
+            for code in row.get("reason_codes", []):
+                if code not in seen_codes:
+                    seen_codes.add(code)
+                    fix = REASON_CODE_REPAIRS.get(code)
+                    if fix:
+                        next_iteration_instructions.append(fix)
+        if not seen_codes:
+            next_iteration_instructions.append(
+                "Use only metadata.source_files and copy row_label, column_label, and raw_value as literal strings from provided corpus chunks."
+            )
     rel = eval_details.get("relative_error")
     if isinstance(rel, (int, float)):
         if rel > 0.01:

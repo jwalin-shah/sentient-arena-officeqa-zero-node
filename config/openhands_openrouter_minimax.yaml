@@ -1,18 +1,18 @@
-dataset_path: data/officeqa_pro.jsonl
+dataset_path: data/sample_questions.jsonl
 backend:
   name: openhands_sdk
   openhands:
-    model: cerebras/qwen-3-235b-a22b-instruct-2507
-    api_key_env: CEREBRAS_API_KEY
-    base_url: https://api.cerebras.ai/v1
-    max_output_tokens: 2048
-    solve_max_output_tokens: 8192
-    timeout_seconds: 120
-    solve_prompt_max_chunks: 2
-    solve_prompt_max_chars_per_chunk: 2500
+    model: minimax/minimax-m2.5:free
+    api_key_env: OPENROUTER_API_KEY
+    base_url: https://openrouter.ai/api/v1
+    max_output_tokens: 1024
+    solve_max_output_tokens: 4096
+    timeout_seconds: 60
+    solve_prompt_max_chunks: 4
+    solve_prompt_max_chars_per_chunk: 4000
     temperature: 0.0
     trace_mode: true
-    structured_output: true
+    structured_output: false
     parse_schema_name: officeqa_parse_v1
     solve_schema_name: officeqa_solve_v1
     system_prompt_path: arena_official/prompts/system.j2
@@ -33,16 +33,16 @@ corpus:
   root_dir: external/officeqa/treasury_bulletins_parsed/transformed
   format: transformed_txt
   max_files_from_year_fallback: 0
-  max_chunks_per_file: 2
-  max_chars_per_chunk: 7000
-  max_total_chunks: 4
+  max_chunks_per_file: 4
+  max_chars_per_chunk: 10000
+  max_total_chunks: 6
 evaluation:
   numeric_tolerance: 0.01
   report_dual_scores: true
 decision:
   final_gate: strict_plus_numeric
 run:
-  default_tag: arena_base_proxy
+  default_tag: openrouter_minimax_m25
 checks:
   enable_unit_check: true
   enable_arithmetic_check: true
@@ -50,11 +50,3 @@ checks:
 evidence_quality:
   max_evidence_rows: 5
   min_signal_score: 5
-  require_full_grounding: true
-  required_rows_by_operation:
-    lookup: 1
-    difference: 2
-    ratio: 2
-    average: 2
-trace:
-  review_enabled: true

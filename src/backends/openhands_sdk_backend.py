@@ -348,9 +348,21 @@ def run_openhands_backend(
     system_prompt = _compose_system_prompt(base_prompt, skill_blocks)
     prompt_chunk_limit = _solve_prompt_chunk_limit(config)
     prompt_chunk_chars = _solve_prompt_chars_per_chunk(config)
+    # Guarantee at least 1 chunk per source file, then fill remainder by score
+    seen_files: set[str] = set()
+    guaranteed: list[dict] = []
+    remainder: list[dict] = []
+    for c in corpus_chunks:
+        sf = c.get("source_file", "")
+        if sf not in seen_files:
+            seen_files.add(sf)
+            guaranteed.append(c)
+        else:
+            remainder.append(c)
+    selected = (guaranteed + remainder)[:prompt_chunk_limit]
     corpus_block = "\n\n".join(
         f"[{c.get('chunk_id')}] source_file={c.get('source_file')}\n{c.get('text','')[:prompt_chunk_chars]}"
-        for c in corpus_chunks[:prompt_chunk_limit]
+        for c in selected
     )
     notes.append(f"solve_prompt_chunk_count={min(len(corpus_chunks), prompt_chunk_limit)}")
     notes.append(f"solve_prompt_char_count={len(corpus_block)}")

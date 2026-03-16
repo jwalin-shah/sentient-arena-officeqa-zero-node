@@ -28,9 +28,9 @@ corpus:
   root_dir: external/officeqa/treasury_bulletins_parsed/transformed
   format: transformed_txt
   max_files_from_year_fallback: 0
-  max_chunks_per_file: 2
-  max_chars_per_chunk: 7000
-  max_total_chunks: 4
+  max_chunks_per_file: 4
+  max_chars_per_chunk: 8000
+  max_total_chunks: 6
 evaluation:
   numeric_tolerance: 0.01
   report_dual_scores: true

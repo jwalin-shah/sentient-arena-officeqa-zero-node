@@ -73,6 +73,8 @@ def _normalize_operation(operation: str) -> str:
         return "difference"
     if op in {"mean", "geometric mean", "weighted average"}:
         return "average"
+    if op in {"sum", "total", "aggregate", "add", "cumulative"}:
+        return "average"  # pipeline treats multi-row aggregation as average operation
     if op in {"percent", "percentage", "rate"}:
         return "ratio"
     return "unknown"

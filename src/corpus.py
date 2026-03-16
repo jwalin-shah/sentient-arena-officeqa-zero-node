@@ -23,6 +23,21 @@ def parse_source_files(value: Any) -> list[str]:
     return files
 
 
+_SECTION_HEADER_RE = re.compile(r"(?:^[A-Z][A-Z\s\-]{4,}$|^-{3,}$)", re.MULTILINE)
+
+
+def _split_by_section(text: str) -> list[str]:
+    """Split on ALL-CAPS headers and --- separators. Returns sections."""
+    positions = [m.start() for m in _SECTION_HEADER_RE.finditer(text)]
+    if len(positions) < 2:
+        return [text]
+    sections = []
+    for i, pos in enumerate(positions):
+        end = positions[i + 1] if i + 1 < len(positions) else len(text)
+        sections.append(text[pos:end].strip())
+    return [s for s in sections if s]
+
+
 def _chunk_text(text: str, *, max_chars: int = 5000, overlap: int = 200) -> list[str]:
     if len(text) <= max_chars:
         return [text]
@@ -116,7 +131,11 @@ def load_transformed_txt_context(
             missing_files.append(filename)
             continue
         text = path.read_text(encoding="utf-8", errors="ignore")
-        all_chunks = _chunk_text(text, max_chars=max_chars)
+        sections = _split_by_section(text)
+        if len(sections) > 1:
+            all_chunks = sections
+        else:
+            all_chunks = _chunk_text(text, max_chars=max_chars)
         scored = sorted(
             enumerate(all_chunks, start=1),
             key=lambda x: _score_chunk(x[1], terms),

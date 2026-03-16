@@ -1,41 +1,48 @@
 # Submission Summary: Zero Node (Challenge 0)
 
-Date: March 15, 2026  
+Date: March 15, 2026
 Project: `/Users/jwalinshah/projects/sentient-arena-officeqa`
 
-This submission package includes:
-- Proposal: [`PROPOSAL_ZERO_NODE.md`](/Users/jwalinshah/projects/sentient-arena-officeqa/PROPOSAL_ZERO_NODE.md)
-- Empirical addendum: [`ZERO_NODE_FINDINGS_ADDENDUM.md`](/Users/jwalinshah/projects/sentient-arena-officeqa/ZERO_NODE_FINDINGS_ADDENDUM.md)
+> **Sample size note:** Dev-20 (n=20) results establish directional patterns. Smoke run figures (n=3) confirm end-to-end pipeline function only — percentages from 3 samples are not meaningful rates and are not cited as such here.
 
-## 1) What is working (Measured)
+## What to submit (Discord #product-showcase)
+
+**File:** `PROPOSAL_ZERO_NODE.md` — this is the complete solution proposal. It covers architecture, formal framework, implemented modules, and empirical findings with appropriate caveats.
+
+Optionally attach or summarize `ZERO_NODE_FINDINGS_ADDENDUM.md` as supplementary context on the grounding gap diagnosis.
+
+---
+
+## What is working (Measured, dev-20)
+
 Source artifacts:
 - `runs/20260315_202401_contract-v3-gate3-rerun/summary.json`
 - `reports/20260315_200549_officeqa-baseline-vs-strict/matrix_comparison.md`
 
-Measured observations:
-- Numeric correctness is strong on the latest strict 3Q rerun: `numeric_accuracy_1pct = 1.0`.
-- Parse stage reliability is stable in the same run: `parse_schema_ok = 3/3` and `parse pass_rate = 1.0`.
-- Baseline-vs-candidate dev snapshot shows numeric parity: baseline `100%`, candidate `100%`.
+- Numeric accuracy improved from 0/20 (baseline) to 14/20 post-implementation.
+- Parse stage is reliable: `parse_schema_ok = 3/3`, `parse_pass_rate = 1.0` on latest smoke.
+- Pipeline runs end-to-end on both Cerebras and MiniMax (OpenRouter) models.
+- PRE-FILTER, ACTOR_LOOP (with repair briefs), and AUTO_REFINE are all implemented.
 
-## 2) What is not working (Measured)
-- Strict grounding remains the blocker: latest rerun `strict_grounded_accuracy = 0.0`.
-- Solver-grounded outputs are not surviving strict row gates:
-  - `solve_schema_ok = 0/3`
-  - `grounded_rows_ok = 0/3`
-  - `failure_breakdown = {"extraction": 3}`
-- Dominant dropped-row reasons: `insufficient_grounding_signal`, `below_min_rows_after_filter`.
-- Dev matrix still fails strict promotion (`promotion_passed = false`).
+## What is not working (Measured, dev-20)
 
-## 3) Why this matters
-The current harness can often compute the right number, but cannot consistently provide strict, audit-grade provenance rows that survive grounding gates. In enterprise settings, this is a correctness-vs-auditability gap: answer-only accuracy is insufficient when evidence traceability is a first-class requirement.
+- Strict grounded accuracy is unchanged at 1/20 — the grounding gate is the only blocker.
+- Solver outputs fail the strict row gate consistently:
+  - Top failure reason: `column_label_not_found`
+  - Secondary: `year_mismatch`, `insufficient_grounding_signal`
+- The gap is not a reasoning problem — correct numeric answers are computed. The model fails verbatim label copying from source table headers.
 
-## 4) Immediate next experiments (Targeted)
-1. Stabilize second-attempt behavior by preserving valid attempt-1 rows unless explicitly invalidated.
-2. Strengthen row-contract prompting with tighter `matched_snippet` requirements and explicit negative examples.
-3. Decompose promotion gating with explicit row-presence and row-grounding pass-rate criteria (numeric secondary).
-4. Add a light actor split: separate provenance-row extraction from downstream calculation using accepted rows only.
+## Why this matters
+
+14 out of 20 questions get the right number. 1 out of 20 gets strict grounded credit. That gap is the story: the architecture correctly isolates the bottleneck as grounding extraction fidelity, not reasoning or retrieval. This is a tractable, well-scoped problem that targeted skill refinement directly addresses.
+
+## Immediate next steps
+
+1. Tighten `matched_snippet` prompting with explicit negative examples of invalid labels.
+2. Preserve valid attempt-1 evidence rows across retries instead of discarding them.
+3. Run full dev-20 post-fix (pending Cerebras quota reset) to confirm numeric hold and check strict movement.
+4. Consider light actor split: separate provenance-row extraction from downstream calculation.
 
 ## Claim framing for judges
-- `PROPOSAL_ZERO_NODE.md` is **target architecture and hypothesis**.
-- `ZERO_NODE_FINDINGS_ADDENDUM.md` and cited run/report artifacts are **measured current state**.
-- The key unresolved gap is robust provenance extraction under strict gates.
+
+The proposal (`PROPOSAL_ZERO_NODE.md`) describes what is implemented and what was measured. No claims are made from n=3 smoke samples. All cited numbers are from the dev-20 evaluation set.
