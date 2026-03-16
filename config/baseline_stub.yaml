@@ -1,0 +1,18 @@
+dataset_path: data/sample_questions.jsonl
+backend:
+  name: local_stub
+subset:
+  limit: 3
+pipeline:
+  parse_mode: rule_based
+  strict_eval_mode: true
+  max_attempts: 1
+corpus:
+  root_dir: external/officeqa/treasury_bulletins_parsed/transformed
+  format: transformed_txt
+  max_chunks_per_file: 2
+  max_chars_per_chunk: 5000
+evaluation:
+  numeric_tolerance: 0.01
+run:
+  default_tag: baseline

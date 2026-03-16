@@ -1,0 +1,57 @@
+dataset_path: data/officeqa_pro.jsonl
+backend:
+  name: openhands_sdk
+  openhands:
+    model: cerebras/qwen-3-235b-a22b-instruct-2507
+    api_key_env: CEREBRAS_API_KEY
+    base_url: https://api.cerebras.ai/v1
+    max_output_tokens: 1024
+    solve_max_output_tokens: 4096
+    timeout_seconds: 90
+    solve_prompt_max_chunks: 1
+    solve_prompt_max_chars_per_chunk: 1800
+    temperature: 0.0
+    trace_mode: true
+    structured_output: true
+    parse_schema_name: officeqa_parse_v1
+    solve_schema_name: officeqa_solve_v1
+    system_prompt_path: prompts/officeqa_prompt.j2
+subset:
+  limit: 3
+pipeline:
+  parse_mode: llm_structured
+  strict_eval_mode: true
+  max_attempts: 1
+  retry_failed_stages_only: true
+  stop_on_strict_pass: true
+corpus:
+  root_dir: external/officeqa/treasury_bulletins_parsed/transformed
+  format: transformed_txt
+  max_files_from_year_fallback: 0
+  max_chunks_per_file: 1
+  max_chars_per_chunk: 5000
+  max_total_chunks: 2
+evaluation:
+  numeric_tolerance: 0.01
+  report_dual_scores: true
+decision:
+  final_gate: strict_plus_numeric
+run:
+  default_tag: cerebras_fast_iter
+checks:
+  enable_unit_check: true
+  enable_arithmetic_check: true
+  enable_evidence_sufficiency_check: true
+  use_llm_grounding_judge: false
+  llm_grounding_override: false
+evidence_quality:
+  max_evidence_rows: 4
+  min_signal_score: 5
+  require_full_grounding: true
+  required_rows_by_operation:
+    lookup: 1
+    difference: 2
+    ratio: 2
+    average: 2
+trace:
+  review_enabled: true

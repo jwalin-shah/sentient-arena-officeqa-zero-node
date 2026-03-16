@@ -1,0 +1,5 @@
+{"question_id":"q1","question":"What was the total public debt in 2020?","expected_answer":"27400","metadata":{"doc_hint":"Treasury Bulletin 2020 Q4","table_hint":"Federal Debt Summary"}}
+{"question_id":"q2","question":"What was the difference between receipts 2019 and receipts 2018?","expected_answer":"150","metadata":{"doc_hint":"Treasury Bulletin 2019 Q4","table_hint":"Receipts and Outlays"}}
+{"question_id":"q3","question":"What percent of outlays were interest payments in 2021?","expected_answer":"0.08","metadata":{"doc_hint":"Treasury Bulletin 2021 Q2","table_hint":"Outlays by Category"}}
+{"question_id":"q4","question":"In 2017, what was the budget deficit?","expected_answer":"665","metadata":{"doc_hint":"Treasury Bulletin 2017 Q4"}}
+{"question_id":"q5","question":"What was the average monthly revenue in 2016?","expected_answer":"250","metadata":{"doc_hint":"Treasury Bulletin 2016 Q4"}}

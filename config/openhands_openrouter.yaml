@@ -1,0 +1,47 @@
+dataset_path: data/sample_questions.jsonl
+backend:
+  name: openhands_sdk
+  openhands:
+    model: openrouter/qwen/qwen3-4b:free
+    api_key_env: OPENROUTER_API_KEY
+    base_url: https://openrouter.ai/api/v1
+    max_output_tokens: 1024
+    solve_max_output_tokens: 8192
+    temperature: 0.0
+    trace_mode: true
+    structured_output: true
+    parse_schema_name: officeqa_parse_v1
+    solve_schema_name: officeqa_solve_v1
+    system_prompt_path: prompts/officeqa_prompt.j2
+subset:
+  limit: 3
+  ids: []
+pipeline:
+  parse_mode: llm_structured
+  strict_eval_mode: true
+  max_attempts: 3
+  retry_failed_stages_only: true
+  stop_on_strict_pass: true
+corpus:
+  root_dir: external/officeqa/treasury_bulletins_parsed/transformed
+  format: transformed_txt
+  max_chunks_per_file: 2
+  max_chars_per_chunk: 5000
+evaluation:
+  numeric_tolerance: 0.01
+  report_dual_scores: true
+decision:
+  final_gate: strict_plus_numeric
+  numeric_tolerance: 0.01
+  numeric_tolerance: 0.01
+trace:
+  review_enabled: true
+logging:
+  include_notes: true
+  include_metadata: true
+run:
+  default_tag: openhands
+checks:
+  enable_unit_check: true
+  enable_arithmetic_check: true
+  enable_evidence_sufficiency_check: true

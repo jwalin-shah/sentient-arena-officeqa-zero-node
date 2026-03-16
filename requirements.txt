@@ -1,0 +1,2 @@
+pyyaml>=6.0
+openhands-sdk>=1.14.0
